@@ -1,5 +1,5 @@
-mail:
-	gcc -o mail main.c
+proxy: main.c
+	gcc -o proxy main.c
 
 clean:
-	rm -f mail
+	rm -f proxy
