@@ -5,51 +5,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include "utils.h"
 
 #define CACHE_DIR "./cache/"
 
-/**
- * Extracts the file path of length `m` in the first line of the request stored in 
- * `buffer` of size `n` and stores it in `dest`, 
- */
-void extract_file_path(char* buffer, char* dest, int n, int* m) {
-    int j = 0;
-    *m = 0;
-    for (int i = 5; i < n; i++) {
-        if (buffer[i] != ' ') {
-            dest[j++] = buffer[i];
-            (*m)++;
-        } else {
-            break;
-        }
-    }
-}
-
-/**
- * Extracts the host name from the URL stored in `url` and stores it in `dest`.
- * The URL is of the form "<host_name>/<path>" (i.e. no http:// or https://).
- * The host name is the part before the first "/".
- * The path is the part after the first "/".
- * Returns the index of the first "/" in the URL (i.e. the start of the path)
- * The host name is stored in `dest`
- */
-int extract_host_name(char* url, char* dest) {
-    int j = 0;
-    for (int i = 0; i < strlen(url); i++) {
-        if (url[i] == '/') {
-            return i; 
-        }
-        dest[j++] = url[i];
-    }
-    return -1;
-}
-
-void extract_path(char* url, char* dest) {
-    char junk[50];
-    int j = extract_host_name(url, junk);
-    if (j == -1) return;
-    strcpy(dest, url + j);
-}
 
 int main() {
 
@@ -102,8 +61,7 @@ int main() {
         printf("[RECV %d bytes] %s\n", bytes_read, buffer);
 
         // extract requested object, which is between "GET " amd " HTTP/1.1"
-        int path_len = 0;
-        extract_file_path(buffer, file_path, 1024, &path_len);
+        int path_len = extract_path(buffer, file_path);
 
         // we basically fetch this from our server
         printf("Extracted path: %s\n", file_path);
